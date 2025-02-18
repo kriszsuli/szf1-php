@@ -1,0 +1,193 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Montserrat", sans-serif;
+  background-color: #0c0c0d;
+  color: #fff;
+  height: 100vh;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  z-index: 1;
+}
+
+h1 {
+  font-size: 3em;
+}
+
+#board {
+  display: grid;
+  grid-template-columns: repeat(3, 100px);
+  grid-template-rows: repeat(3, 100px);
+  gap: 5px;
+  justify-content: center;
+  margin: 20px auto;
+}
+
+#status[data-status="X"]::after {
+  content: "❌ Te jössz!";
+  color: #fff;
+  font-size: 0.9em;
+}
+#status[data-status="O"]::after {
+  content: "⭕ Az AI gondolkodik...";
+  color: #fff;
+  font-size: 0.9em;
+}
+#status[data-status="win"]::after {
+  content: "🎉 Nyertél!";
+  color: #fff;
+  font-size: 0.9em;
+}
+#status[data-status="lose"]::after {
+  content: "😢 Vesztettél!";
+  color: #fff;
+  font-size: 0.9em;
+}
+#status[data-status="draw"]::after {
+  content: "🙃 Döntetlen!";
+  color: #fff;
+  font-size: 0.9em;
+}
+
+.cell {
+  width: 100px;
+  height: 100px;
+  background-color: #9993;
+  border: 2px solid #fff2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 5rem;
+  cursor: pointer;
+  font-weight: 100;
+  transition: all 0.2s ease-in-out;
+  border-radius: 0.05em;
+}
+
+.cell:hover {
+  transform: scale(1.02);
+}
+
+.cell[data-selected="X"] {
+  background-color: #f432;
+  color: #fff;
+}
+
+.cell[data-selected="O"] {
+  background-color: #3af2;
+  color: #fff;
+}
+
+#reset:before {
+  content: "↺";
+  color: #fff;
+  font-size:1.5em;
+}
+
+#reset:hover {
+  background-color: #88a2bb;
+}
+
+#reset {
+  background-color: #88a2bb33;
+  color: #fff;
+  font-weight: bold;
+  border-radius:10px;
+  border: 2px solid #fff2;
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.15s ease-in-out;
+}
+
+.spin {
+  animation-name: spin-anim;
+  animation-duration: .5s;
+  animation-timing-function: ease;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+}
+
+@keyframes spin-anim {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(-360deg); }
+}
+
+#status {
+  margin-top: 20px;
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+select {
+  appearance: none;
+  background-color: #1c1c1eae;
+  color: #fff;
+  padding: 10px 20px;
+  border: 1px solid #444;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.3s ease;
+
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23fff' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5H7z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 12px;
+}
+
+.blobs::before,
+.blobs::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  filter: blur(200px);
+  opacity: 0.6;
+  z-index: -1;
+  transition:background .5s ease-in-out;
+}
+
+.blobs.x::before {
+  width: 800px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(150, 100, 100, 0.8), transparent 70%);
+}
+
+.blobs.o::before {
+  width: 800px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(100, 100, 150, 0.8), transparent 70%);
+}
+
+.blobs.win::before {
+  width: 800px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(100, 150, 100, 0.8), transparent 70%);
+}
+
+.blobs.lose::before {
+  width: 800px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(100, 100, 100, 0.8), transparent 70%);
+}
+
+h2.timer {
+  margin-bottom: 20px;
+  font-size: 1.5rem;
+  text-align: center;
+  background-color: #0c0c0daf;
+  padding: 1rem;
+  border-radius: 10px;
+}
