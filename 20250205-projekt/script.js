@@ -1,16 +1,18 @@
+/*   Deklarálás   */
 const board = document.getElementById("board");
 const cells = document.querySelectorAll(".cell");
 const statusText = document.getElementById("status");
 const resetButton = document.getElementById("reset");
 const difficultySelect = document.getElementById("difficulty");
 
+/*   Alapértékek   */
 let difficulty = 0.9;
-
 const HUMAN_PLAYER = "X";
 const AI_PLAYER = "O";
 let currentPlayer = HUMAN_PLAYER;
 let gameBoard = Array(9).fill(null);
 
+/*   Lehetséges nyerési kombinációk indexe   */
 const WINNING_COMBINATIONS = [
   [0, 1, 2],
   [3, 4, 5],
@@ -22,7 +24,7 @@ const WINNING_COMBINATIONS = [
   [2, 4, 6],
 ];
 
-
+/*   Háttérváltoztatás   */
 function bgChange(state) {
   switch(state.toLowerCase()){
     case "win":
@@ -32,12 +34,7 @@ function bgChange(state) {
       document.querySelector(".blobs").classList.add("win");
       break;
     case "lose":
-      document.querySelector(".blobs").classList.remove("x");
-      document.querySelector(".blobs").classList.remove("o");
-      document.querySelector(".blobs").classList.add("lose");
-      document.querySelector(".blobs").classList.remove("win");
-      break;
-    case "draw":  
+    case "draw":
       document.querySelector(".blobs").classList.remove("x");
       document.querySelector(".blobs").classList.remove("o");
       document.querySelector(".blobs").classList.add("lose");
@@ -56,7 +53,7 @@ function bgChange(state) {
       document.querySelector(".blobs").classList.remove("win");
       break;
     default:
-      document.querySelector(".blobs").classList.add("x");
+      document.querySelector(".blobs").classList.remove("x");
       document.querySelector(".blobs").classList.remove("o");
       document.querySelector(".blobs").classList.remove("lose");
       document.querySelector(".blobs").classList.remove("win");
@@ -65,6 +62,7 @@ function bgChange(state) {
   return state;
 }
 
+/*   Időzítő   */
 let timerElement;
 let timerStart = 0;
 let finalTime = 0;
@@ -80,7 +78,6 @@ function timeStart(){
     document.querySelector("h2.timer").textContent = `${minutes}:${seconds}.${milliseconds.toString().padStart(3, "0")}`;
   }, 10);
 }
-
 function timeStop(){
   clearInterval(timerElement);
   timerElement = null;
@@ -89,6 +86,7 @@ function timeStop(){
   document.querySelector("h2.timer").textContent = `${parseTime(finalTime)}`;
 }
 
+/*   Játék újra/elkezdése   */
 function initializeGame() {
   cells.forEach((cell) => {
     cell.textContent = "";
@@ -103,6 +101,7 @@ function initializeGame() {
   document.querySelector("h2.timer").innerHTML = "00:00.000";
 }
 
+/*   Helper function: időformátum átalakítása   */
 function parseTime(t){
   const minutes = Math.floor(t / 60000).toString().padStart(2, "0");
   const seconds = Math.floor((t % 60000) / 1000).toString().padStart(2, "0");
@@ -110,9 +109,21 @@ function parseTime(t){
   return `${minutes}:${seconds}.${milliseconds.toString().padStart(3, "0")}`
 }
 
+/*   Helper function: SHA256 hash generáló   */
+async function sha256(message) {
+    const msgBuffer = new TextEncoder().encode(message);                    
+    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));              
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    return hashHex;
+}
+
+/*   Fő function: klikkek kezelése   */
 async function handleCellClick(e) {
   const cell = e.target;
   const index = cell.dataset.index;
+  
+  if(currentPlayer === AI_PLAYER) return;
 
   if (gameBoard[index] || checkWinner(gameBoard)) return;
   if (!timerElement) timeStart();
@@ -130,7 +141,71 @@ async function handleCellClick(e) {
       showCancelButton: true
     })
     if (name) {
-      // TODO: ezt majd xddd
+		fetch('api/submit_score.php', {
+			method: 'POST',
+			headers: {
+			  'Content-Type': 'application/x-www-form-urlencoded'
+			},
+			body: new URLSearchParams({
+			  name: name,
+			  time: finalTime
+			})
+		})
+		.then(response => {return response.json()})
+		.then(data => {
+      if(data.error) {
+        console.error(data.error);
+        const Toast = Swal.mixin({
+          toast: true,
+          position: "top-end",
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+          }
+        });
+        Toast.fire({
+          icon: "error",
+          title: "Hiba történt a pontszám elküldése közben."
+        });
+        return;
+      }
+			const Toast = Swal.mixin({
+			  toast: true,
+			  position: "top-end",
+			  showConfirmButton: false,
+			  timer: 3000,
+			  timerProgressBar: true,
+			  didOpen: (toast) => {
+				toast.onmouseenter = Swal.stopTimer;
+				toast.onmouseleave = Swal.resumeTimer;
+			  }
+			});
+			Toast.fire({
+			  icon: "success",
+			  title: "Pontszám elküldve!"
+			});
+		})
+		.catch(error => {
+			console.error(error);
+			const Toast = Swal.mixin({
+			  toast: true,
+			  position: "top-end",
+			  showConfirmButton: false,
+			  timer: 3000,
+			  timerProgressBar: true,
+			  didOpen: (toast) => {
+				toast.onmouseenter = Swal.stopTimer;
+				toast.onmouseleave = Swal.resumeTimer;
+			  }
+			});
+			Toast.fire({
+			  icon: "error",
+			  title: "Hiba történt a pontszám elküldése közben."
+			});
+		});
     }
 
     return;
@@ -187,7 +262,8 @@ function checkWinner(board) {
   return null;
 }
 
-function minimax(board, depth, isMaximizing) {
+// Minimax algoritmus (AI)
+function minimax(board, depth, isMaximizing, difficulty) {
   const winner = checkWinner(board);
 
   if (winner === AI_PLAYER) return 10 - depth;
@@ -212,7 +288,8 @@ function minimax(board, depth, isMaximizing) {
         }
       }
     }
-
+	
+	// Nehézségkezelő
     if (Math.random() > 1 - difficulty) {
       return bestMoves[Math.floor(Math.random() * bestMoves.length)];
     }
@@ -236,7 +313,8 @@ function minimax(board, depth, isMaximizing) {
         }
       }
     }
-
+	
+	// Nehézségkezelő
     if (Math.random() > 1 - difficulty) {
       return bestMoves[Math.floor(Math.random() * bestMoves.length)];
     }
