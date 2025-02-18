@@ -6,7 +6,7 @@ Tábla struktúrája:
 
 CREATE TABLE eredmenyek (
  	id MEDIUMINT NOT NULL AUTO_INCREMENT,
-    name VARCHAR(30) NOT NULL UNIQUE,
+    name VARCHAR(30) NOT NULL,
     score INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id)
