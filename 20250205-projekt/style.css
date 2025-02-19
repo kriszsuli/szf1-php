@@ -224,6 +224,8 @@ h2.timer {
   font-size: 1rem;
   padding: 8px 0;
   border-bottom: 1px solid #444;
+  text-wrap: pretty;
+  word-wrap: break-word;
 }
 
 .leaderboard li::before {
