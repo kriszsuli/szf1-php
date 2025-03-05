@@ -5,13 +5,14 @@
 - Scoreboard lekérdezése
 
 ### Dátumok
-**Határidő:** ~~2025. 02. 19.~~ ~~2025. 02. 26.~~ 2025. 03. 05.
+**Határidő:** ~~2025. 02. 19.~~ ~~2025. 02. 26.~~ ~~2025. 03. 05.~~ 2025. 03. 12.
 
-<sub>(Remélhetőleg most már *final* határidő. :D)</sub>
+<sub>(Remélhetőleg most már *final* határidő. :D)</sub><br>
+<sup>- update: nem volt final</sup>
 
 - **02.05.** - tervezés és kód
 - **02.12.** - csak kódolás
-- ~~**02.19.**~~ **03.05.** - második órában __bemutatni__ mindenki előtt
+- ~~**02.19.**~~ ~~**03.05.**~~ **03.12.** - második órában __bemutatni__ mindenki előtt
 
 ### Jegyek (2 db)
 1. előadás
