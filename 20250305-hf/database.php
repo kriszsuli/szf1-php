@@ -7,6 +7,9 @@ $db_config = [
     'database' => '0305db'
 ];
 
+// alapfeltételek: legyen egy 0305db nevű adatbázis
+//                 ennyi igazából, table-t megcsinálja magától
+
 $conn = new mysqli($db_config['host'], $db_config['username'], $db_config['password'], $db_config['database']);
 
 if ($conn->connect_error) {
