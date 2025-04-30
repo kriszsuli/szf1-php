@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>tárgy</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Montserrat", "Segoe UI", "Arial", sans-serif;
+      }
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100vh;
+        background-color: #f5f2de;
+      }
+      span {
+        color: white;
+        background-color: red;
+        padding: 10px;
+      }
+      span:before {
+        content: "✖";
+        margin-right: 10px;
+      }
+      span.success {
+        color: black;
+        background-color: #f5ecde;
+      }
+      span.success::before {
+        content: "";
+      }
+      span:empty {
+        display: none;
+      }
+      form {
+        display: flex;
+        flex-direction: column;
+        width: min(600px, 50%);
+        margin: 0 auto;
+        text-align: center;
+        background: white;
+        padding: 50px;
+        border-radius: 20px;
+        gap: 10px;
+      }
+      input {
+        padding: 10px;
+      }
+      button {
+        outline: none;
+        border: 2px solid black;
+        background-color: #fff;
+        color: #000;
+        padding: 10px;
+        font-weight: bold;
+      }
+      h1 {
+        font-size: 1.5em;
+      }
+      p {
+        font-size: 0.75em;
+        font-style: italic;
+        color: gray;
+      }
+    </style>
+  </head>
+  <body>
+    <!--álmos vagyok nagyon durván, ha valamit elírtam akkor valószínűleg nem direkt volt-->
+    <form id="xd">
+      <h1>tárgytárolós oldal tárgytárolós tárgytárolósoknak</h1>
+      <input type="text" placeholder="Pou pólók.." name="item" id="item" />
+      <button type="submit">Bejegyzés</button>
+      <span></span>
+      <p>
+        tárgyat lehet tárolni a tárgytárolós tárgytároló oldallal. a tárgyai
+        nevét a tárgy mezőbe megadja tárgyként és sok tárgyalás után eltárolja a
+        tárgytárolóban a tárgytároló oldal a tárgyat, amelyet a tárgyakat
+        tartalmazó tárgyalás utáni tárgyként hozzáadható tárgytárolós tárgy
+        tömbhöz ad hozzá, mint tárgy, amit felhasználhat a tárgytárolós
+        tárgytároló oldalon, ami szintén egy tárgynak minősül, így mondhatjuk,
+        hogy ezen tárgytárolós tárgytároló oldal egy tárgytárolós tárgytároló
+        tárgy amelyet lehet tárolni a tárgytárolós tárgytároló tárgytömbben.
+        felhívjuk kedves tárgytárolós tárgytároló felhasználóink figyelmét, hogy
+        ezen tárgytárolós tárgytároló tárgy használatával megvan az esély, hogy
+        tárgyalás nélkül a tárgytárolós tárgytároló felhasználó a tárgytömb
+        része lesz, így maga is tárggyá válék, így tárgyként felhasználhatjuk a
+        tárgyként minősített tárgytárolós tárgytároló felhasználót a
+        tárgytárolós tárgytároló tömbben.
+      </p>
+    </form>
+
+    <script>
+      const fiorm = document.getElementById("xd");
+
+      let itkmes = [];
+
+      fiorm.onsubmit = async (e) => {
+        e.preventDefault();
+
+        const iktem = document.getElementById("item").value;
+        fiorm.reset();
+
+        if (!iktem || iktem.length <= 0) return error("Adj meg egy tárgynevet");
+        const check = itkmes.filter(
+          (x) => x.toLowerCase() === iktem.toLowerCase()
+        );
+        if (check.length > 0) return error("Ez a tárgy már létezik a tömbben!");
+
+        // == easter eggs :D ==
+        // nem ér decodeolni a youtube linkeket, se megtörni a hasht >:(
+        const hash = await sha256(iktem.toLowerCase());
+        if (
+          hash ===
+          "93cc4ad2a2102405c97fd2128f4e9e0cd704273373a11f7443a91850f7a57ce7"
+        ) {
+          return (window.location.href = `https://youtu.be/${atob(
+            hexdec("4d455257616a4a7063327452526e4d3d")
+          )}`);
+        } else if (
+          hash ===
+            "deadd7662420e5af11794c0e1d607c37736afffbef38037e29dbaec6c6add204" ||
+          hash ===
+            "0e0b9ab9c732a90428bb9963f8be6cf73f7bf78fabf58115500892991d396148"
+        ) {
+          return success("kösz");
+        } else if (
+          hash ===
+          "39106116d8a2659047dd3e8089ed5d80adfd4ea51450a0b20515972f92953f43"
+        ) {
+          return (window.location.href = `https://www.youtube.com/shorts/${atob(
+            hexdec("5a6d524d59544a42646c4a4a5a45453d")
+          )}`);
+        }
+        // == easter eggs block end ==
+
+        itkmes.push(iktem);
+        return success(
+          `✅ ${iktem} hozzáadva!\ntömb jelenlegi tartalma: ${itkmes.join(
+            ", "
+          )}`
+        );
+      };
+      const xd = document.querySelector("span");
+
+      const success = (s) => {
+        xd.classList.add("success");
+        xd.innerText = s;
+      };
+      const error = (s) => {
+        xd.classList.remove("success");
+        xd.innerText = s;
+      };
+
+      async function sha256(msg) {
+        const mBuf = new TextEncoder().encode(msg);
+        const hBuf = await crypto.subtle.digest("SHA-256", mBuf);
+        const arr = Array.from(new Uint8Array(hBuf));
+        const res = arr.map((b) => b.toString(16).padStart(2, "0")).join("");
+        return res;
+      }
+
+      function hexenc(msg) {
+        return msg
+          .split("")
+          .map((c) => c.charCodeAt(0).toString(16).padStart(2, "0"))
+          .join("");
+      }
+
+      function hexdec(msg) {
+        return msg
+          .split(/(\w\w)/g)
+          .filter((p) => !!p)
+          .map((c) => String.fromCharCode(parseInt(c, 16)))
+          .join("");
+      }
+    </script>
+  </body>
+</html>
